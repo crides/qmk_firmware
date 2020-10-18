@@ -270,6 +270,7 @@ void oled_render(void) {
     // Do we have work to do?
     oled_dirty &= OLED_ALL_BLOCKS_MASK;
     if (!oled_dirty || oled_scrolling) {
+        oled_active = false;
         return;
     }
 
@@ -668,3 +669,9 @@ void oled_task(void) {
 }
 
 __attribute__((weak)) void oled_task_user(void) {}
+
+uint8_t oled_set_contrast(uint8_t contrast) {
+    uint8_t buf[2] = {0x81, 0};
+    buf[1] = contrast;
+    return I2C_WRITE_REG(I2C_CMD, buf, 2);
+}

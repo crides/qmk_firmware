@@ -298,3 +298,5 @@ uint8_t oled_max_chars(void);
 
 // Returns the maximum number of lines that will fit on the oled
 uint8_t oled_max_lines(void);
+
+uint8_t oled_set_contrast(uint8_t);

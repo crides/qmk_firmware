@@ -222,7 +222,7 @@ void send_unicode_hex_string(const char *str) {
 // clang-format on
 
 // Borrowed from https://nullprogram.com/blog/2017/10/06/
-static const char *decode_utf8(const char *str, int32_t *code_point) {
+const char *decode_utf8(const char *str, int32_t *code_point) {
     const char *next;
 
     if (str[0] < 0x80) {  // U+0000-007F

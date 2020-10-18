@@ -82,6 +82,7 @@ uint8_t get_unicode_input_mode(void);
 void    set_unicode_input_mode(uint8_t mode);
 void    cycle_unicode_input_mode(int8_t offset);
 void    persist_unicode_input_mode(void);
+const char *decode_utf8(const char *str, int32_t *code_point);
 
 void unicode_input_start(void);
 void unicode_input_finish(void);
