@@ -43,6 +43,10 @@ ifeq ($(strip $(VIRTSER_ENABLE)), yes)
 	LUFA_SRC += $(LUFA_ROOT_PATH)/Drivers/USB/Class/Device/CDCClassDevice.c
 endif
 
+ifeq ($(strip $(MSC_ENABLE)), yes)
+	LUFA_SRC += $(LUFA_ROOT_PATH)/Drivers/USB/Class/Device/MassStorageClassDevice.c
+endif
+
 SRC += $(LUFA_SRC)
 
 # Search Path

@@ -391,6 +391,32 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
         .ConfigAttributes       = (USB_CONFIG_ATTR_RESERVED | USB_CONFIG_ATTR_REMOTEWAKEUP),
         .MaxPowerConsumption    = USB_CONFIG_POWER_MA(USB_MAX_POWER_CONSUMPTION)
     },
+#ifdef MSC_ENABLE
+    .MS_Interface = {
+        .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
+        .InterfaceNumber        = MSC_INTERFACE,
+        .AlternateSetting       = 0,
+        .TotalEndpoints         = 2,
+        .Class                  = MS_CSCP_MassStorageClass,
+        .SubClass               = MS_CSCP_SCSITransparentSubclass,
+        .Protocol               = MS_CSCP_BulkOnlyTransportProtocol,
+        .InterfaceStrIndex      = NO_DESCRIPTOR
+    },
+    .MS_DataInEndpoint = {
+        .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
+        .EndpointAddress        = ENDPOINT_DIR_IN | MSC_IN_EPNUM,
+        .Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+        .EndpointSize           = MSC_EPSIZE,
+        .PollingIntervalMS      = 0x05
+    },
+    .MS_DataOutEndpoint = {
+        .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
+        .EndpointAddress        = ENDPOINT_DIR_OUT | MSC_OUT_EPNUM,
+        .Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+        .EndpointSize           = MSC_EPSIZE,
+        .PollingIntervalMS      = 0x05
+    },
+#endif
 #ifndef KEYBOARD_SHARED_EP
     /*
      * Keyboard

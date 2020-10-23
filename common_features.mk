@@ -59,6 +59,10 @@ ifeq ($(strip $(VIRTSER_ENABLE)), yes)
     OPT_DEFS += -DVIRTSER_ENABLE
 endif
 
+ifeq ($(strip $(MSC_ENABLE)), yes)
+    OPT_DEFS += -DMSC_ENABLE
+endif
+
 ifeq ($(strip $(FAUXCLICKY_ENABLE)), yes)
     OPT_DEFS += -DFAUXCLICKY_ENABLE
     SRC += $(QUANTUM_DIR)/fauxclicky.c

@@ -130,6 +130,11 @@ typedef struct {
     USB_HID_Descriptor_HID_t   Joystick_HID;
     USB_Descriptor_Endpoint_t  Joystick_INEndpoint;
 #endif
+#ifdef MSC_ENABLE
+    USB_Descriptor_Interface_t            MS_Interface;
+    USB_Descriptor_Endpoint_t             MS_DataInEndpoint;
+    USB_Descriptor_Endpoint_t             MS_DataOutEndpoint;
+#endif
 } USB_Descriptor_Configuration_t;
 
 /*
@@ -173,6 +178,9 @@ enum usb_interfaces {
 
 #if defined(JOYSTICK_ENABLE)
     JOYSTICK_INTERFACE,
+#endif
+#ifdef MSC_ENABLE
+    MSC_INTERFACE,
 #endif
     TOTAL_INTERFACES
 };
@@ -233,6 +241,10 @@ enum usb_endpoints {
     JOYSTICK_IN_EPNUM  = NEXT_EPNUM,
     JOYSTICK_OUT_EPNUM = NEXT_EPNUM,
 #endif
+#ifdef MSC_ENABLE
+    MSC_IN_EPNUM = NEXT_EPNUM,
+    MSC_OUT_EPNUM = NEXT_EPNUM,
+#endif
 };
 
 #ifdef PROTOCOL_LUFA
@@ -258,6 +270,7 @@ enum usb_endpoints {
 #define CDC_NOTIFICATION_EPSIZE 8
 #define CDC_EPSIZE 16
 #define JOYSTICK_EPSIZE 8
+#define MSC_EPSIZE 64
 
 uint16_t get_usb_descriptor(const uint16_t wValue, const uint16_t wIndex, const void** const DescriptorAddress);
 #endif

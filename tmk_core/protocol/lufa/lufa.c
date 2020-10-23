@@ -146,6 +146,30 @@ host_driver_t  lufa_driver = {
     keyboard_leds, send_keyboard, send_mouse, send_system, send_consumer,
 };
 
+#ifdef MSC_ENABLE
+USB_ClassInfo_MS_Device_t msc_device = {
+    .Config = {
+        .InterfaceNumber       = MSC_INTERFACE,
+        .DataINEndpoint = {
+            .Address           = ENDPOINT_DIR_IN | MSC_IN_EPNUM,
+            .Size              = MSC_EPSIZE,
+            .Banks             = 1,
+        },
+        .DataOUTEndpoint = {
+            .Address           = ENDPOINT_DIR_OUT | MSC_OUT_EPNUM,
+            .Size              = MSC_EPSIZE,
+            .Banks             = 1,
+        },
+        .TotalLUNs             = 1,
+    },
+};
+
+bool handle_scsi_command(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo);
+bool CALLBACK_MS_Device_SCSICommandReceived(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo) {
+	return handle_scsi_command(MSInterfaceInfo);
+}
+#endif
+
 #ifdef VIRTSER_ENABLE
 // clang-format off
 
@@ -523,6 +547,9 @@ void EVENT_USB_Device_ConfigurationChanged(void) {
 #ifdef JOYSTICK_ENABLE
     /* Setup joystick endpoint */
     ConfigSuccess &= Endpoint_ConfigureEndpoint((JOYSTICK_IN_EPNUM | ENDPOINT_DIR_IN), EP_TYPE_INTERRUPT, JOYSTICK_EPSIZE, 1);
+#endif
+#ifdef MSC_ENABLE
+	ConfigSuccess &= MS_Device_ConfigureEndpoints(&msc_device);
 #endif
 }
 
@@ -1080,6 +1107,10 @@ int main(void) {
                 USB_Device_SendRemoteWakeup();
             }
         }
+#endif
+
+#ifdef MSC_ENABLE
+        MS_Device_USBTask(&msc_device);
 #endif
 
         keyboard_task();
