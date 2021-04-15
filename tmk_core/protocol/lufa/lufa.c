@@ -1053,6 +1053,10 @@ static void setup_usb(void) {
     print_set_sendchar(sendchar);
 }
 
+// Flag for denoting if the dictionary is exposed for read/write via the MSC device.
+#ifdef MSC_ENABLE
+bool dict_msc_enable = 0;
+#endif
 /** \brief Main
  *
  * FIXME: Needs doc
@@ -1064,6 +1068,12 @@ int main(void) {
 #endif
 
     setup_mcu();
+#ifdef MSC_ENABLE
+    DDRB &= ~_BV(DDB0);
+    PORTB |= _BV(PORTB0);
+    asm volatile ("nop");
+    dict_msc_enable = !(PINB & _BV(PINB0));
+#endif
     keyboard_setup();
     setup_usb();
     sei();
@@ -1110,7 +1120,9 @@ int main(void) {
 #endif
 
 #ifdef MSC_ENABLE
-        MS_Device_USBTask(&msc_device);
+        if (dict_msc_enable) {
+            MS_Device_USBTask(&msc_device);
+        }
 #endif
 
         keyboard_task();

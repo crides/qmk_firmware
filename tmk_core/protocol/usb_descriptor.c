@@ -992,6 +992,9 @@ uint16_t get_usb_descriptor(const uint16_t wValue, const uint16_t wIndex, const 
     const void*   Address         = NULL;
     uint16_t      Size            = NO_DESCRIPTOR;
 
+#ifdef MSC_ENABLE
+    extern bool dict_msc_enable;
+#endif
     switch (DescriptorType) {
         case DTYPE_Device:
             Address = &DeviceDescriptor;
@@ -1000,7 +1003,16 @@ uint16_t get_usb_descriptor(const uint16_t wValue, const uint16_t wIndex, const 
             break;
         case DTYPE_Configuration:
             Address = &ConfigurationDescriptor;
+#ifdef MSC_ENABLE
+            Size = offsetof(USB_Descriptor_Configuration_t, MS_Interface);
+#else
             Size    = sizeof(USB_Descriptor_Configuration_t);
+#endif
+#ifdef MSC_ENABLE
+            if (dict_msc_enable) {
+                Size    = sizeof(USB_Descriptor_Configuration_t);
+            }
+#endif
 
             break;
         case DTYPE_String:
