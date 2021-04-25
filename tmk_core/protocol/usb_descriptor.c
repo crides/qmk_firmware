@@ -391,32 +391,6 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
         .ConfigAttributes       = (USB_CONFIG_ATTR_RESERVED | USB_CONFIG_ATTR_REMOTEWAKEUP),
         .MaxPowerConsumption    = USB_CONFIG_POWER_MA(USB_MAX_POWER_CONSUMPTION)
     },
-#ifdef MSC_ENABLE
-    .MS_Interface = {
-        .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
-        .InterfaceNumber        = MSC_INTERFACE,
-        .AlternateSetting       = 0,
-        .TotalEndpoints         = 2,
-        .Class                  = MS_CSCP_MassStorageClass,
-        .SubClass               = MS_CSCP_SCSITransparentSubclass,
-        .Protocol               = MS_CSCP_BulkOnlyTransportProtocol,
-        .InterfaceStrIndex      = NO_DESCRIPTOR
-    },
-    .MS_DataInEndpoint = {
-        .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
-        .EndpointAddress        = ENDPOINT_DIR_IN | MSC_IN_EPNUM,
-        .Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-        .EndpointSize           = MSC_EPSIZE,
-        .PollingIntervalMS      = 0x05
-    },
-    .MS_DataOutEndpoint = {
-        .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
-        .EndpointAddress        = ENDPOINT_DIR_OUT | MSC_OUT_EPNUM,
-        .Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-        .EndpointSize           = MSC_EPSIZE,
-        .PollingIntervalMS      = 0x05
-    },
-#endif
 #ifndef KEYBOARD_SHARED_EP
     /*
      * Keyboard
@@ -938,6 +912,47 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
 #endif
 };
 
+#ifdef MSC_ENABLE
+const USB_MSC_Descriptor_Configuration_t PROGMEM MSCConfigurationDescriptor = {
+    .Config = {
+        .Header = {
+            .Size               = sizeof(USB_Descriptor_Configuration_Header_t),
+            .Type               = DTYPE_Configuration
+        },
+        .TotalConfigurationSize = sizeof(USB_MSC_Descriptor_Configuration_t),
+        .TotalInterfaces        = 1,
+        .ConfigurationNumber    = 1,
+        .ConfigurationStrIndex  = NO_DESCRIPTOR,
+        .ConfigAttributes       = (USB_CONFIG_ATTR_RESERVED | USB_CONFIG_ATTR_REMOTEWAKEUP),
+        .MaxPowerConsumption    = USB_CONFIG_POWER_MA(USB_MAX_POWER_CONSUMPTION)
+    },
+    .MS_Interface = {
+        .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
+        .InterfaceNumber        = 0,
+        .AlternateSetting       = 0,
+        .TotalEndpoints         = 2,
+        .Class                  = MS_CSCP_MassStorageClass,
+        .SubClass               = MS_CSCP_SCSITransparentSubclass,
+        .Protocol               = MS_CSCP_BulkOnlyTransportProtocol,
+        .InterfaceStrIndex      = NO_DESCRIPTOR
+    },
+    .MS_DataInEndpoint = {
+        .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
+        .EndpointAddress        = ENDPOINT_DIR_IN | MSC_IN_EPNUM,
+        .Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+        .EndpointSize           = MSC_EPSIZE,
+        .PollingIntervalMS      = 0x05
+    },
+    .MS_DataOutEndpoint = {
+        .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
+        .EndpointAddress        = ENDPOINT_DIR_OUT | MSC_OUT_EPNUM,
+        .Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+        .EndpointSize           = MSC_EPSIZE,
+        .PollingIntervalMS      = 0x05
+    },
+};
+#endif
+
 /*
  * String descriptors
  */
@@ -1002,18 +1017,16 @@ uint16_t get_usb_descriptor(const uint16_t wValue, const uint16_t wIndex, const 
 
             break;
         case DTYPE_Configuration:
-            Address = &ConfigurationDescriptor;
-#ifdef MSC_ENABLE
-            Size = offsetof(USB_Descriptor_Configuration_t, MS_Interface);
-#else
-            Size    = sizeof(USB_Descriptor_Configuration_t);
-#endif
 #ifdef MSC_ENABLE
             if (dict_msc_enable) {
-                Size    = sizeof(USB_Descriptor_Configuration_t);
-            }
+                Address = &MSCConfigurationDescriptor;
+                Size = sizeof(USB_MSC_Descriptor_Configuration_t);
+            } else
 #endif
-
+            {
+                Address = &ConfigurationDescriptor;
+                Size = sizeof(USB_Descriptor_Configuration_t);
+            }
             break;
         case DTYPE_String:
             switch (DescriptorIndex) {

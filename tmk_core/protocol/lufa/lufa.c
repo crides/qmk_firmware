@@ -149,7 +149,7 @@ host_driver_t  lufa_driver = {
 #ifdef MSC_ENABLE
 USB_ClassInfo_MS_Device_t msc_device = {
     .Config = {
-        .InterfaceNumber       = MSC_INTERFACE,
+        .InterfaceNumber       = 0,
         .DataINEndpoint = {
             .Address           = ENDPOINT_DIR_IN | MSC_IN_EPNUM,
             .Size              = MSC_EPSIZE,
@@ -1122,31 +1122,32 @@ int main(void) {
 #ifdef MSC_ENABLE
         if (dict_msc_enable) {
             MS_Device_USBTask(&msc_device);
-        }
+        } else
 #endif
-
-        keyboard_task();
+        {
+            keyboard_task();
 
 #ifdef MIDI_ENABLE
-        MIDI_Device_USBTask(&USB_MIDI_Interface);
+            MIDI_Device_USBTask(&USB_MIDI_Interface);
 #endif
 
 #ifdef MODULE_ADAFRUIT_BLE
-        adafruit_ble_task();
+            adafruit_ble_task();
 #endif
 
 #ifdef VIRTSER_ENABLE
-        virtser_task();
-        CDC_Device_USBTask(&cdc_device);
+            virtser_task();
+            CDC_Device_USBTask(&cdc_device);
 #endif
 
 #ifdef RAW_ENABLE
-        raw_hid_task();
+            raw_hid_task();
 #endif
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)
-        USB_USBTask();
+            USB_USBTask();
 #endif
+        }
     }
 }
 

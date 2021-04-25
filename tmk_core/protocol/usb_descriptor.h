@@ -130,12 +130,16 @@ typedef struct {
     USB_HID_Descriptor_HID_t   Joystick_HID;
     USB_Descriptor_Endpoint_t  Joystick_INEndpoint;
 #endif
+} USB_Descriptor_Configuration_t;
+
 #ifdef MSC_ENABLE
+typedef struct {
+    USB_Descriptor_Configuration_Header_t Config;
     USB_Descriptor_Interface_t            MS_Interface;
     USB_Descriptor_Endpoint_t             MS_DataInEndpoint;
     USB_Descriptor_Endpoint_t             MS_DataOutEndpoint;
+} USB_MSC_Descriptor_Configuration_t;
 #endif
-} USB_Descriptor_Configuration_t;
 
 /*
  * Interface indexes
@@ -178,9 +182,6 @@ enum usb_interfaces {
 
 #if defined(JOYSTICK_ENABLE)
     JOYSTICK_INTERFACE,
-#endif
-#ifdef MSC_ENABLE
-    MSC_INTERFACE,
 #endif
     TOTAL_INTERFACES
 };
